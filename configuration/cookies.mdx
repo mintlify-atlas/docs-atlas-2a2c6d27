@@ -1,0 +1,127 @@
+---
+title: 'Setting Up Twitter Cookies'
+description: 'Complete guide to extracting and configuring Twitter session cookies for the DM bot'
+---
+
+## Overview
+
+The Twitter DM Bot requires your Twitter session cookies to authenticate and send messages on your behalf. This eliminates the need for Twitter API access or payment, as the bot uses your normal browser session cookies to automate the manual workflow of sending DMs.
+
+## Cookie Extraction Process
+
+<Steps>
+  <Step title="Login to Twitter">
+    Open your browser and login to your Twitter account. Make sure you're using the account you want the bot to operate with.
+  </Step>
+
+  <Step title="Install Cookie Editor Extension">
+    Download and install the Cookie-Editor browser extension:
+    
+    - **For Microsoft Edge and Chrome**: [Cookie-Editor](https://microsoftedge.microsoft.com/addons/detail/cookieeditor/neaplmfkghagebokkhpjpoebhdledlfi)
+    - **For Firefox**: Search for "Cookie-Editor" in Firefox Add-ons
+    
+    Once installed, you should see the cookie icon in your browser's extension toolbar.
+  </Step>
+
+  <Step title="Export Your Cookies">
+    1. While logged into Twitter, click on the Cookie-Editor extension icon
+    2. Click the "Export" button (usually at the bottom of the extension popup)
+    3. This will copy all cookies from the current site to your clipboard
+  </Step>
+
+  <Step title="Create cookies.json File">
+    1. Navigate to the root directory of the application (the main folder where you downloaded/extracted the bot)
+    2. Create a new file and name it exactly `cookies.json`
+    3. Paste the copied cookies into this file
+    4. Save the file
+  </Step>
+</Steps>
+
+<Warning>
+  Pay close attention to the `.json` extension when creating the file. The file must be named `cookies.json`, not `cookies.json.txt` or `cookies`. 
+  
+  If you have file extensions hidden in your operating system, make sure to enable them to verify the correct extension.
+</Warning>
+
+## Extension-Specific Configuration
+
+<Note>
+  Depending on the cookie editor extension you use, you may need to modify the exported JSON file:
+  
+  - Some extensions export cookies with `"sameSite": null`
+  - Other extensions may require you to change `null` to `"unspecified"`
+  
+  If you encounter authentication issues, try changing all instances of `null` to `"unspecified"` in the cookies.json file.
+</Note>
+
+## Security Considerations
+
+<Warning>
+  **Important Security Notes:**
+  
+  - Your cookies.json file contains sensitive authentication data
+  - Never commit this file to version control (it should be in .gitignore)
+  - Never share this file with anyone
+  - Store it securely and delete it when no longer needed
+  - Consider it equivalent to your Twitter password
+</Warning>
+
+<Info>
+  The bot uses these cookies to authenticate with Twitter as if you were manually using the browser. This is why no API keys or OAuth tokens are needed.
+</Info>
+
+## Troubleshooting Common Issues
+
+### Bot Fails to Login
+
+**Problem**: The bot starts but can't authenticate with Twitter.
+
+**Solutions**:
+- Verify the cookies.json file is in the root directory (not in src/ or any subdirectory)
+- Check that the file extension is exactly `.json`
+- Try exporting the cookies again while logged into Twitter
+- Clear your browser cache and cookies, login again, then re-export
+
+### "Invalid JSON" Error
+
+**Problem**: Application throws a JSON parsing error.
+
+**Solutions**:
+- Validate your JSON using a tool like JSONLint
+- Ensure you copied the entire cookie export (check for missing brackets)
+- Try the `null` to `"unspecified"` conversion mentioned above
+- Re-export cookies and ensure nothing was cut off during copy/paste
+
+### Cookies Expire Quickly
+
+**Problem**: Authentication works initially but fails after a short time.
+
+**Solutions**:
+- Twitter session cookies have an expiration time
+- Re-export fresh cookies from an active Twitter session
+- Make sure you're staying logged into Twitter in your browser
+- Don't logout of Twitter while the bot is running
+
+### Rate Limiting
+
+**Problem**: Twitter blocks or limits your account.
+
+<Tip>
+  The bot automatically pauses when Twitter's rate limit is detected. This is a built-in feature to protect your account from being flagged for spam.
+  
+  If you're consistently hitting rate limits:
+  - Reduce the frequency of messages
+  - Take breaks between bot sessions
+  - Ensure your message content appears natural and not spammy
+</Tip>
+
+## Best Practices
+
+<Tip>
+  **Cookie Management Tips:**
+  
+  - Export fresh cookies before each bot session for best results
+  - Keep your Twitter browser session active while running the bot
+  - Test with a small number of messages first to ensure cookies are working
+  - Monitor your Twitter account for any security alerts
+</Tip>

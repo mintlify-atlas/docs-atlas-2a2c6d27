@@ -1,80 +1,194 @@
 ---
-title: "Quickstart"
-description: "Start building awesome documentation in minutes"
+title: Quick Start
+description: Send your first automated Twitter DM in minutes
 ---
 
-## Get started in three steps
+# Quick Start Guide
 
-Get your documentation site running locally and make your first customization.
+Follow these steps to configure the bot and send your first automated direct message on Twitter.
 
-### Step 1: Set up your local environment
+<Note>
+  Make sure you've completed the [Installation](/installation) steps before proceeding.
+</Note>
 
-<AccordionGroup>
-  <Accordion icon="copy" title="Clone your docs locally">
-    During the onboarding process, you created a GitHub repository with your docs content if you didn't already have one. You can find a link to this repository in your [dashboard](https://dashboard.mintlify.com).
+## Complete Workflow
+
+<Steps>
+  <Step title="Export Twitter Cookies">
+    The bot needs your Twitter session cookies to authenticate. Here's how to extract them:
+
+    1. **Log into Twitter** in your browser (Chrome or Edge recommended)
+    2. **Install Cookie-Editor Extension**:
+       - [Cookie-Editor for Chrome/Edge](https://microsoftedge.microsoft.com/addons/detail/cookieeditor/neaplmfkghagebokkhpjpoebhdledlfi)
+    3. **Click the Cookie-Editor icon** in your browser toolbar while on twitter.com
+    4. **Click "Export"** button in the extension popup
+    5. **Copy the exported cookies** to your clipboard
+
+    <Warning>
+      Keep your cookies private! Anyone with access to your session cookies can access your Twitter account.
+    </Warning>
+  </Step>
+
+  <Step title="Create cookies.json File">
+    In the root directory of the bot (same level as `package.json`), create a new file named `cookies.json`:
+
+    ```bash
+    # Create the file
+    touch cookies.json
+    ```
+
+    Paste the exported cookies into this file. The content should look like this:
+
+    ```json
+    [
+      {
+        "domain": ".twitter.com",
+        "expirationDate": 1234567890,
+        "hostOnly": false,
+        "httpOnly": true,
+        "name": "auth_token",
+        "path": "/",
+        "sameSite": "None",
+        "secure": true,
+        "session": false,
+        "storeId": null,
+        "value": "your_token_here"
+      }
+    ]
+    ```
+
+    <Info>
+      Pay attention to the `.json` extension - it's important! Some systems may hide file extensions by default.
+    </Info>
+
+    <Tip>
+      Depending on the cookie extension you use, you may need to change `null` to `"unspecified"` in the `sameSite` field when saving as JSON.
+    </Tip>
+  </Step>
+
+  <Step title="Configure the Bot">
+    Open `src/config.ts` in your code editor. You'll see this structure:
+
+    ```typescript src/config.ts
+    interface Config{
+        searchQuery: string,
+        message: string
+    }
     
-    To clone the repository locally so that you can make and preview changes to your docs, follow the [Cloning a repository](https://docs.github.com/en/repositories/creating-and-managing-repositories/cloning-a-repository) guide in the GitHub docs.
-  </Accordion>
-  <Accordion icon="rectangle-terminal" title="Start the preview server">
-    1. Install the Mintlify CLI: `npm i -g mint`
-    2. Navigate to your docs directory and run: `mint dev`
-    3. Open `http://localhost:3000` to see your docs live!
+    let config: Config = {
+        searchQuery: "vancouver",
+        message: "Hi there, Hope you are doing well."
+    }
     
-    <Tip>Your preview updates automatically as you edit files.</Tip>
-  </Accordion>
-</AccordionGroup>
+    export default config
+    ```
 
-### Step 2: Deploy your changes
+    **Customize the parameters:**
 
-<AccordionGroup>
-  <Accordion icon="github" title="Install our GitHub app">
-    Install the Mintlify GitHub app from your [dashboard](https://dashboard.mintlify.com/settings/organization/github-app).
+    | Parameter | Description | Example |
+    |-----------|-------------|----------|
+    | `searchQuery` | Search query to find users on Twitter's explore page. Can be a hashtag, location, or keyword | `"#developer"`, `"New York"`, `"startup"` |
+    | `message` | The message you want to send to each user | `"Hi! I'd love to connect..."` |
+
+    **Example configuration:**
+
+    ```typescript src/config.ts
+    let config: Config = {
+        searchQuery: "#webdevelopment",
+        message: "Hi! I noticed you're into web development. Would love to connect and share ideas!"
+    }
+    ```
+
+    Save the file after making changes.
+  </Step>
+
+  <Step title="Run the Bot">
+    Open your terminal in the project directory and execute:
+
+    ```bash
+    npm start
+    ```
+
+    This command runs `tsx watch src/index.ts` (as defined in package.json) and starts the automation.
+
+    <Info>
+      The bot runs in non-headless mode, so you'll see a Chromium browser window open and watch the automation happen in real-time.
+    </Info>
+  </Step>
+
+  <Step title="Monitor the Output">
+    The bot will start working and display console output. Here's what to expect:
+
+    ```bash
+    # Browser launches and navigates to Twitter search
+    Set { 'https://twitter.com/user1', 'https://twitter.com/user2' }
     
-    Our GitHub app automatically deploys your changes to your docs site, so you don't need to manage deployments yourself.
-</Accordion>
-<Accordion icon="palette" title="Update your site name and colors">
-    For a first change, let's update the name and colors of your docs site.
+    # When a message is successfully sent
+    Message sent
+    
+    # If rate limit is reached
+    Script paused for 15 minutes
+    ```
 
-    1. Open `docs.json` in your editor.
-    2. Change the `"name"` field to your project name.
-    3. Update the `"colors"` to match your brand.
-    4. Save and see your changes instantly at `http://localhost:3000`.
+    **What the bot does:**
 
-    <Tip>Try changing the primary color to see an immediate difference!</Tip>
-  </Accordion>
-</AccordionGroup>
+    1. Opens Twitter search with your query: `https://twitter.com/search?q=${searchQuery}&f=live`
+    2. Scrolls through results and extracts profile links
+    3. Opens each profile and checks if messaging is available
+    4. Checks if the message was already sent (duplicate prevention)
+    5. Sends your configured message if possible
+    6. Pauses for 15 minutes if rate limit is detected
 
-### Step 3: Go live
+    <Warning>
+      If you see "Message failed to send" repeatedly, the bot will automatically pause for 15 minutes to avoid triggering Twitter's spam detection.
+    </Warning>
+  </Step>
+</Steps>
 
-<Accordion icon="rocket" title="Publish your docs">
-  1. Commit and push your changes.
-  2. Your docs will update and be live in moments!
-</Accordion>
+## What to Watch For
 
-## Next steps
+### Success Indicators
 
-Now that you have your docs running, explore these key features:
+- Browser window opens automatically
+- Twitter search page loads with your query
+- Profile links appear in console: `Set { 'https://twitter.com/...' }`
+- "Message sent" appears when DMs are successfully delivered
+
+### Common Issues
+
+<Warning>
+  **Cookies Not Working**: If the bot can't authenticate, your cookies may have expired. Export fresh cookies and replace the `cookies.json` file.
+</Warning>
+
+<Info>
+  **No DM Button Found**: Many users have DMs restricted to followers only. The bot will skip these profiles automatically.
+</Info>
+
+<Tip>
+  **Rate Limiting**: Start with a narrow search query to test with fewer users. This helps you avoid rate limits while learning how the bot works.
+</Tip>
+
+## Testing Your Setup
+
+Before running a full campaign:
+
+1. **Test with a specific username** search to limit results
+2. **Watch the first 2-3 messages** to ensure they're sent correctly
+3. **Check your Twitter DM inbox** to verify messages appear as expected
+4. **Monitor for rate limit warnings** in the console
+
+## Next Steps
 
 <CardGroup cols={2}>
-
-<Card title="Write Content" icon="pen-to-square" href="/essentials/markdown">
-  Learn MDX syntax and start writing your documentation.
-</Card>
-
-<Card title="Customize style" icon="palette" href="/essentials/settings">
-  Make your docs match your brand perfectly.
-</Card>
-
-<Card title="Add code examples" icon="square-code" href="/essentials/code">
-  Include syntax-highlighted code blocks.
-</Card>
-
-<Card title="API documentation" icon="code" href="/api-reference/introduction">
-  Auto-generate API docs from OpenAPI specs.
-</Card>
-
+  <Card title="Configuration" icon="gear" href="/configuration/settings">
+    Learn more about advanced configuration options
+  </Card>
+  
+  <Card title="Troubleshooting" icon="wrench" href="/reference/troubleshooting">
+    Resolve common issues and errors
+  </Card>
 </CardGroup>
 
 <Note>
-  **Need help?** See our [full documentation](https://mintlify.com/docs) or join our [community](https://mintlify.com/community).
+  Remember: The bot maintains a visited URLs set during each run to prevent duplicate messages. If you restart the bot, it will start fresh.
 </Note>

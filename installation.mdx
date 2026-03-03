@@ -1,0 +1,144 @@
+---
+title: Installation
+description: Set up the Twitter DM Bot on your system
+---
+
+# Installation Guide
+
+Get the Twitter DM Bot up and running on your system with these simple setup steps.
+
+## Prerequisites
+
+Before you begin, ensure you have the following installed:
+
+<Note>
+  **Node.js Required**: This bot requires Node.js to run. Download it from [nodejs.org](https://nodejs.org/en/download) if you haven't already.
+</Note>
+
+### System Requirements
+
+- **Node.js**: Version 14 or higher recommended
+- **Operating System**: Windows, Linux, or macOS
+- **Browser**: Chrome or Edge (for cookie extraction)
+- **Twitter Account**: Active account with login access
+
+<Warning>
+  Make sure you're logged into your Twitter account in your browser before proceeding with cookie extraction.
+</Warning>
+
+## Setup Process
+
+<Steps>
+  <Step title="Download the Repository">
+    Download or clone the repository to your local machine:
+
+    ```bash
+    # If using git
+    git clone <repository-url>
+    
+    # Or download the ZIP file and extract it
+    ```
+
+    Navigate to the downloaded folder in your terminal:
+
+    ```bash
+    cd twitter-bot-puppeteer
+    ```
+  </Step>
+
+  <Step title="Install Dependencies">
+    Open the terminal in the project directory and install required libraries:
+
+    ```bash
+    npm install
+    ```
+
+    This command will install:
+    - **puppeteer** (v19.11.0) - Browser automation
+    - **puppeteer-extra** (v3.3.6) - Extended Puppeteer functionality
+    - **puppeteer-extra-plugin-stealth** (v2.11.2) - Stealth mode to avoid detection
+    - **@types/node** (v18.16.0) - TypeScript definitions
+
+    <Info>
+      The installation may take a few minutes as Puppeteer downloads a compatible Chromium browser.
+    </Info>
+
+    Expected output:
+    ```bash
+    added 150 packages, and audited 151 packages in 45s
+    
+    23 packages are looking for funding
+      run `npm fund` for details
+    
+    found 0 vulnerabilities
+    ```
+  </Step>
+
+  <Step title="Verify Installation">
+    Confirm that all dependencies were installed correctly:
+
+    ```bash
+    npm list --depth=0
+    ```
+
+    You should see output similar to:
+    ```bash
+    twitter-bot-puppeteer@1.1.0
+    ├── @types/node@18.16.0
+    ├── puppeteer@19.11.0
+    ├── puppeteer-extra@3.3.6
+    └── puppeteer-extra-plugin-stealth@2.11.2
+    ```
+  </Step>
+</Steps>
+
+## Cross-Platform Notes
+
+### Windows
+
+Use **Command Prompt** or **PowerShell** to run commands:
+
+```powershell
+# Open PowerShell in the project folder
+cd C:\path\to\twitter-bot-puppeteer
+npm install
+```
+
+### Linux
+
+You may need to install additional dependencies for Puppeteer:
+
+```bash
+# Debian/Ubuntu
+sudo apt-get install -y libgbm-dev
+
+# Then install npm packages
+npm install
+```
+
+### macOS
+
+No additional steps required. Simply run:
+
+```bash
+cd /path/to/twitter-bot-puppeteer
+npm install
+```
+
+<Tip>
+  On macOS, if you encounter permission errors, avoid using `sudo` with npm. Instead, [configure npm to install packages globally without sudo](https://docs.npmjs.com/resolving-eacces-permissions-errors-when-installing-packages-globally).
+</Tip>
+
+## Next Steps
+
+Now that you've installed the bot, proceed to the [Quick Start Guide](/quickstart) to configure your cookies and send your first automated DM.
+
+<CardGroup cols={2}>
+  <Card title="Quick Start" icon="rocket" href="/quickstart">
+    Configure and run your first DM campaign
+  </Card>
+  
+  <Card title="Configuration" icon="gear" href="/configuration/settings">
+    Customize search queries and messages
+  </Card>
+</CardGroup>

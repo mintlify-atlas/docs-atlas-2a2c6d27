@@ -1,0 +1,116 @@
+---
+title: "Limitations"
+description: "Known limitations and constraints of the Twitter DM Bot"
+---
+
+## Overview
+
+The Twitter DM Bot has several limitations due to Twitter's platform restrictions and the browser-based automation approach. Understanding these limitations will help you set realistic expectations for your messaging campaigns.
+
+## Platform Limitations
+
+### DM Recipient Restrictions
+
+<Warning>
+  You can only send messages to users who have enabled the option to receive DMs from people they don't follow. Users with restricted DM settings will not receive your messages.
+</Warning>
+
+The bot can only send messages to profiles that have allowed messages from users outside of their followers and following list. This is a Twitter platform restriction, not a bot limitation.
+
+### Twitter Plus Subscription Required
+
+<Warning>
+  Due to Twitter's recent updates, you now need a **Twitter Plus subscription** to send messages to people who have the option to receive DMs from unknown people disabled.
+</Warning>
+
+This is a recent change in Twitter's policy that affects all users attempting to send DMs to non-followers.
+
+## Rate Limiting
+
+### Twitter's Rate Limits
+
+Twitter imposes rate limits on how many DMs you can send in a given time period to prevent spam:
+
+- The bot automatically detects rate limit errors
+- When rate limited, the bot pauses for **15 minutes** before resuming (see `index.ts:147`)
+- The exact number of messages allowed varies based on your account status and Twitter's policies
+
+<Note>
+  The bot includes built-in rate limit detection and will automatically pause when it encounters a "Message failed to send" error, waiting 15 minutes before resuming operations.
+</Note>
+
+## Technical Constraints
+
+### Browser-Based Approach
+
+The bot uses Puppeteer to automate a Chromium browser, which has several implications:
+
+- **Visible browser window**: The bot runs with `headless: false` (see `index.ts:19`), meaning you'll see the browser window during operation
+- **Resource intensive**: Running a full browser instance requires more memory and CPU than API-based solutions
+- **Session dependency**: Requires valid session cookies to authenticate
+- **Network dependent**: Relies on stable internet connection for page loading and navigation
+
+### Timeout Constraints
+
+The bot has several built-in timeouts that may affect performance:
+
+- **Message button detection**: 5 seconds timeout (see `index.ts:103`)
+- **Previous message check**: 10 seconds timeout (see `index.ts:113`)
+- **Message box detection**: 5 seconds timeout (see `index.ts:126`)
+- **Rate limit error check**: 2 seconds timeout (see `index.ts:143`)
+
+<Info>
+  If a profile page loads slowly or elements take longer than the timeout values to appear, the bot will skip that user and move to the next one.
+</Info>
+
+### Duplicate Message Prevention
+
+The bot checks if the same message has already been sent to a profile to prevent spam alarm triggering:
+
+- Only works for the current session (memory-based, not persistent across restarts)
+- Uses a `Set` to track visited URLs during runtime
+- Does not persist message history between bot executions
+
+## Authentication Limitations
+
+### Cookie-Based Authentication
+
+<Warning>
+  The bot requires manual cookie extraction from your browser. You cannot use username/password authentication.
+</Warning>
+
+Limitations of cookie-based auth:
+
+- Cookies expire and need to be refreshed periodically
+- Requires manual export using browser extensions
+- Does not work with Twitter API credentials
+- May require cookie format adjustments (changing `null` to `unspecified` for some extensions)
+
+## Workarounds
+
+### For Slow Networks
+
+If you experience timeout errors frequently:
+
+1. Increase timeout values in `src/index.ts`
+2. Ensure stable internet connection
+3. Run the bot during off-peak hours for better performance
+
+### For Rate Limiting
+
+To minimize rate limiting:
+
+1. Start with smaller batches of messages
+2. Allow the bot to run its automatic 15-minute pause cycle
+3. Avoid running multiple instances simultaneously
+4. Consider spacing out campaigns over multiple days
+
+### For Cookie Expiration
+
+1. Export fresh cookies if authentication fails
+2. Keep your browser session active while the bot runs
+3. Check the cookie format matches the expected structure
+
+<Tip>
+  Test with a small search query first to ensure your cookies are valid and the bot is working correctly before running large campaigns.
+</Tip>

@@ -1,0 +1,80 @@
+---
+title: Introduction
+description: Automate direct message outreach on Twitter with intelligent rate limiting and duplicate prevention
+---
+
+# Twitter DM Bot
+
+Automate the sending of direct messages to people on Twitter's search page with just a few simple commands. This bot leverages Puppeteer to control a Chromium browser, enabling you to reach potential connections without paying for Twitter's API access.
+
+<Note>
+  This bot uses your existing Twitter session cookies to authenticate - no API keys or Twitter Developer account required.
+</Note>
+
+## What Does It Do?
+
+The Twitter DM Bot crawls Twitter search results (Top, Latest, People, etc.) based on your search query and automatically sends direct messages to profiles that allow DMs from non-followers. It's perfect for:
+
+- Networking and outreach campaigns
+- Event promotion to local communities
+- Building connections around specific topics or hashtags
+- Recruiting or lead generation
+
+## Key Features
+
+<CardGroup cols={2}>
+  <Card title="No API Required" icon="key">
+    Uses normal session cookies instead of expensive Twitter API access
+  </Card>
+  
+  <Card title="Smart Duplicate Prevention" icon="shield-check">
+    Checks whether messages were already sent to prevent spam detection
+  </Card>
+  
+  <Card title="Rate Limit Handling" icon="clock">
+    Automatically pauses when Twitter's rate limit is triggered
+  </Card>
+  
+  <Card title="Cross-Platform" icon="laptop">
+    Works on Windows, Linux, and macOS
+  </Card>
+</CardGroup>
+
+## How It Works
+
+1. **Extract Cookies**: Export your Twitter session cookies from your browser
+2. **Configure Target**: Set your search query (hashtag, location, or keyword)
+3. **Customize Message**: Write the message you want to send
+4. **Run the Bot**: Execute `npm start` and watch it work
+
+The bot navigates to Twitter's search page, scrolls through results, and opens each profile to check if messaging is available. It maintains a record of visited profiles to avoid sending duplicate messages.
+
+<Warning>
+  Due to Twitter's recent updates, you may need a Twitter Plus subscription to send messages to users who have disabled DMs from unknown people.
+</Warning>
+
+## Limitations
+
+- Can only send messages to people who have allowed messages outside of their followers/following
+- Requires Twitter Plus subscription for users with restricted DM settings
+- Subject to Twitter's rate limits for continuous messaging
+
+## Get Started
+
+<CardGroup cols={3}>
+  <Card title="Installation" icon="download" href="/installation">
+    Set up Node.js and install dependencies
+  </Card>
+  
+  <Card title="Quick Start" icon="rocket" href="/quickstart">
+    Send your first automated DM in minutes
+  </Card>
+  
+  <Card title="Configuration" icon="gear" href="/configuration/settings">
+    Customize search queries and messages
+  </Card>
+</CardGroup>
+
+<Tip>
+  Always test with a small number of messages first to ensure your account doesn't trigger Twitter's spam detection.
+</Tip>

@@ -1,0 +1,289 @@
+---
+title: "Troubleshooting"
+description: "Common issues and solutions for the Twitter DM Bot"
+---
+
+## Overview
+
+This guide covers common issues you may encounter while using the Twitter DM Bot and their solutions.
+
+## Authentication Issues
+
+<Accordion title="Cookie authentication failed - Bot cannot log in">
+  **Symptoms:**
+  - Bot opens Twitter but shows logged-out state
+  - Unable to access search results or profiles
+  - Error loading pages
+
+  **Solutions:**
+  
+  1. **Export fresh cookies:**
+     - Log into Twitter in your browser
+     - Use the Cookie-Editor extension to export cookies
+     - Save to `cookies.json` in the root directory
+  
+  2. **Check cookie format:**
+     - Ensure the file is valid JSON
+     - Depending on your extension, you may need to change `null` to `unspecified` in the cookie values
+     - Verify the file extension is `.json`, not `.txt`
+  
+  3. **Verify cookie freshness:**
+     - Cookies expire over time
+     - Export new cookies if they're more than a few days old
+     - Keep your browser session active while the bot runs
+
+  **Example valid cookie structure:**
+  ```json
+  [
+    {
+      "name": "auth_token",
+      "value": "your_token_here",
+      "domain": ".twitter.com",
+      "sameSite": "unspecified"
+    }
+  ]
+  ```
+</Accordion>
+
+<Accordion title="Two-factor authentication (2FA) issues">
+  **Symptoms:**
+  - Bot cannot authenticate even with valid cookies
+  - Login prompts appear during bot operation
+
+  **Solutions:**
+  
+  1. **Export cookies AFTER 2FA:**
+     - Complete 2FA login in your browser first
+     - Then export the cookies from the authenticated session
+     - The cookies will contain your authenticated session
+  
+  2. **Keep browser session active:**
+     - Don't log out of Twitter in your browser while the bot runs
+     - This keeps your session valid
+</Accordion>
+
+## Message Sending Errors
+
+<Accordion title='"Message failed to send" error and 15-minute pause'>
+  **Symptoms:**
+  - Console shows: `"Message failed to send"`
+  - Console shows: `"Script paused for 15 minutes"`
+  - Bot stops sending messages temporarily
+
+  **What's happening:**
+  
+  This is Twitter's rate limit protection (see `index.ts:142-148`). The bot detects the error message and automatically pauses for 15 minutes.
+
+  **Solutions:**
+  
+  1. **Let it run:**
+     - The bot will automatically resume after 15 minutes
+     - This is built-in behavior and requires no action
+  
+  2. **Prevent future rate limits:**
+     - Send fewer messages per session
+     - Space out campaigns over multiple days
+     - Avoid running multiple bot instances simultaneously
+  
+  3. **Adjust pause duration (advanced):**
+     - Edit `src/index.ts` line 147
+     - Current: `setTimeout(() => resolve(true), 1000 * 15 * 60);`
+     - Change `15` to a different number of minutes if needed
+
+  <Warning>
+    Reducing the pause duration below 15 minutes may result in your account being temporarily restricted by Twitter.
+  </Warning>
+</Accordion>
+
+<Accordion title="Messages not sending to specific users">
+  **Symptoms:**
+  - Bot skips certain profiles
+  - No error message, just moves to next user
+
+  **What's happening:**
+  
+  The user has not enabled DMs from non-followers, or the message button is not detected within the timeout period.
+
+  **Solutions:**
+  
+  1. **Check user DM settings:**
+     - This is expected behavior for users who don't allow DMs from non-followers
+     - No action needed - the bot correctly skips these users
+  
+  2. **Increase timeout for slow loading:**
+     - Edit `src/index.ts` line 103
+     - Change `timeout: 5000` to a higher value (e.g., `10000` for 10 seconds)
+  
+  3. **Verify Twitter Plus subscription:**
+     - Recent Twitter updates require Twitter Plus to message many users
+     - Check your subscription status
+</Accordion>
+
+## Browser and Selector Errors
+
+<Accordion title="Browser launch failed or crashes">
+  **Symptoms:**
+  - Error: "Failed to launch browser"
+  - Chromium crashes during operation
+  - Blank browser window
+
+  **Solutions:**
+  
+  1. **Install required dependencies:**
+     ```bash
+     npm install
+     ```
+  
+  2. **Linux systems - install Chromium dependencies:**
+     ```bash
+     sudo apt-get install -y \
+       gconf-service libasound2 libatk1.0-0 libc6 libcairo2 \
+       libcups2 libdbus-1-3 libexpat1 libfontconfig1 libgcc1 \
+       libgconf-2-4 libgdk-pixbuf2.0-0 libglib2.0-0 libgtk-3-0 \
+       libnspr4 libpango-1.0-0 libpangocairo-1.0-0 libstdc++6 \
+       libx11-6 libx11-xcb1 libxcb1 libxcomposite1 libxcursor1 \
+       libxdamage1 libxext6 libxfixes3 libxi6 libxrandr2 \
+       libxrender1 libxss1 libxtst6 ca-certificates \
+       fonts-liberation libnss3 lsb-release xdg-utils wget
+     ```
+  
+  3. **Check available memory:**
+     - Chromium requires significant RAM
+     - Close other applications if running low on memory
+  
+  4. **Verify Node.js version:**
+     - Ensure Node.js is properly installed
+     - Recommended: Node.js 14 or higher
+</Accordion>
+
+<Accordion title="Selector not found / Element not found errors">
+  **Symptoms:**
+  - Error: "waiting for selector... failed: timeout"
+  - Specific selectors like `sendDMFromProfile`, `DmScrollerContainer`, or `dmComposerSendButton` not found
+  - Bot skips users or crashes
+
+  **What's happening:**
+  
+  Twitter has updated their UI, or the page didn't load in time.
+
+  **Solutions:**
+  
+  1. **Increase timeout values:**
+     
+     In `src/index.ts`, increase these timeout values:
+     - Line 103: `timeout: 5000` → `timeout: 10000` (message button)
+     - Line 113: `timeout: 10000` → `timeout: 15000` (previous message check)
+     - Line 126: `timeout: 5000` → `timeout: 10000` (message box)
+  
+  2. **Check for Twitter UI updates:**
+     - Twitter may have changed their HTML structure
+     - Check the project's GitHub issues for updates
+     - Update to the latest version of the bot
+  
+  3. **Verify network stability:**
+     - Ensure stable internet connection
+     - Test with a smaller search query first
+     - Run during off-peak hours
+</Accordion>
+
+## Network and Timeout Errors
+
+<Accordion title="Network timeout errors">
+  **Symptoms:**
+  - Pages fail to load
+  - `waitForNetworkIdle` times out
+  - Slow performance
+
+  **Solutions:**
+  
+  1. **Check internet connection:**
+     - Ensure stable, high-speed connection
+     - Test your connection speed
+     - Avoid running on unstable networks
+  
+  2. **Increase viewport size:**
+     - Some content loads based on viewport
+     - Edit `src/index.ts` line 28:
+     ```typescript
+     await page.setViewport({ width: 1920, height: 1080 });
+     ```
+  
+  3. **Add retry logic (advanced):**
+     - Wrap navigation in try-catch blocks
+     - Implement retry on failure
+</Accordion>
+
+<Accordion title="Page navigation failures">
+  **Symptoms:**
+  - Search page doesn't load
+  - Profile pages fail to open
+  - Infinite loading states
+
+  **Solutions:**
+  
+  1. **Verify search query:**
+     - Ensure `searchQuery` in `config.ts` is valid
+     - Test the query manually on Twitter first
+  
+  2. **Clear browser cache:**
+     - Delete Puppeteer's user data directory
+     - Restart the bot with fresh browser instance
+  
+  3. **Check Twitter status:**
+     - Visit [Twitter Status](https://api.twitterstat.us/)
+     - Twitter may be experiencing outages
+</Accordion>
+
+## Configuration Issues
+
+<Accordion title="cookies.json file not found">
+  **Symptoms:**
+  - Error: "ENOENT: no such file or directory, open 'cookies.json'"
+
+  **Solutions:**
+  
+  1. **Create the file in the correct location:**
+     - File must be in the **root directory** of the project
+     - Not in `src/` or any subdirectory
+  
+  2. **Verify file name:**
+     - Must be exactly `cookies.json`
+     - Check for hidden extensions (Windows may hide `.txt`)
+  
+  3. **Check file permissions:**
+     - Ensure the file is readable
+     - On Linux/Mac: `chmod 644 cookies.json`
+</Accordion>
+
+<Accordion title="config.ts changes not taking effect">
+  **Symptoms:**
+  - Bot uses old message or search query
+  - Configuration changes ignored
+
+  **Solutions:**
+  
+  1. **Rebuild the project:**
+     ```bash
+     npm start
+     ```
+     TypeScript needs to be recompiled when source files change.
+  
+  2. **Verify config.ts location:**
+     - File should be at `src/config.ts`
+     - Check that you're editing the correct file
+  
+  3. **Check for syntax errors:**
+     - Ensure valid TypeScript syntax
+     - Look for compilation errors in the console
+</Accordion>
+
+## Still Having Issues?
+
+<Tip>
+  If your issue isn't covered here:
+  
+  1. Check the browser console for specific error messages
+  2. Review the terminal output for detailed logs
+  3. Search the project's GitHub issues
+  4. Create a new issue with your error logs and configuration (remove sensitive data like cookies)
+</Tip>

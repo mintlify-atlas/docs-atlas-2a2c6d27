@@ -1,0 +1,280 @@
+---
+title: "Frequently Asked Questions"
+description: "Common questions about the Twitter DM Bot"
+---
+
+## Getting Started
+
+<Accordion title="Do I need Twitter API access to use this bot?">
+  **No, you do not need Twitter API access or any API keys.**
+
+  This is one of the main advantages of this bot. It does not require access to or payment for any Twitter APIs. Instead, it uses your normal session cookies and automates the manual workflow of sending DMs through the browser interface.
+
+  The bot uses Puppeteer to control a Chromium browser, simulating what you would do manually - but automatically.
+
+  <Info>
+    You only need to export your browser cookies (which is free) to authenticate the bot.
+  </Info>
+</Accordion>
+
+<Accordion title="Why do I need a Twitter Plus subscription?">
+  **Twitter Plus is required to send DMs to users who have disabled DMs from unknown people.**
+
+  Due to Twitter's recent platform updates, you now need a Twitter Plus subscription to send messages to people who have the option to receive DMs from non-followers disabled. This is a Twitter policy change, not a bot limitation.
+
+  Without Twitter Plus:
+  - You can still send DMs to users who explicitly allow messages from everyone
+  - You will have limited reach in your messaging campaigns
+  - Many users won't receive your messages
+
+  With Twitter Plus:
+  - You can message a much wider audience
+  - Better campaign reach and effectiveness
+
+  <Warning>
+    This is a Twitter platform requirement implemented in recent updates. The bot itself doesn't enforce this - Twitter does.
+  </Warning>
+</Accordion>
+
+<Accordion title="What browsers are supported?">
+  **The bot uses Chromium via Puppeteer.**
+
+  You don't need to have Chromium installed separately - Puppeteer automatically downloads and manages a compatible version of Chromium when you run `npm install`.
+
+  Technical details (from `index.ts:1-20`):
+  - Uses `puppeteer-extra` with stealth plugin
+  - Launches Chromium in non-headless mode (`headless: false`)
+  - Includes custom user agent and browser arguments
+  - Cross-platform support: Windows, Linux, and macOS
+
+  <Note>
+    You'll see the browser window while the bot runs. This is intentional and cannot be changed to headless mode without modifying the source code.
+  </Note>
+</Accordion>
+
+## Usage and Features
+
+<Accordion title="How many messages can I send?">
+  **The number of messages you can send is limited by Twitter's rate limiting policies.**
+
+  The bot doesn't impose its own message limits, but Twitter does:
+  
+  - Exact limits vary based on your account age, status, and behavior
+  - Twitter may temporarily restrict your account if you send too many messages too quickly
+  - The bot automatically detects rate limits and pauses for 15 minutes when hit
+
+  **Best practices:**
+  - Start with small batches (10-20 messages) to test
+  - Monitor for rate limit messages
+  - Space out campaigns over multiple days
+  - Let the bot run its automatic pause cycle when rate limited
+
+  <Tip>
+    The bot includes built-in spam prevention by checking if you've already sent the same message to a profile, helping you stay within Twitter's good graces.
+  </Tip>
+</Accordion>
+
+<Accordion title="Can I customize the delay between messages?">
+  **Yes, but it requires code modification.**
+
+  The bot doesn't currently have a configuration option for message delays, but you can add custom delays:
+
+  1. Open `src/index.ts`
+  2. After line 135 (after the send button click), add:
+     ```typescript
+     await new Promise(resolve => setTimeout(resolve, 5000)); // 5 second delay
+     ```
+  3. Adjust `5000` to your desired delay in milliseconds
+
+  **Recommended delays:**
+  - Minimum: 2-3 seconds (2000-3000ms)
+  - Conservative: 5-10 seconds (5000-10000ms)
+  - Very safe: 15-30 seconds (15000-30000ms)
+
+  <Warning>
+    Longer delays mean slower campaigns but reduce the risk of triggering Twitter's spam detection.
+  </Warning>
+</Accordion>
+
+<Accordion title="Does this work with two-factor authentication (2FA)?">
+  **Yes, it works with 2FA-enabled accounts.**
+
+  The key is to export your cookies AFTER you've authenticated with 2FA:
+
+  1. Log into Twitter in your browser
+  2. Complete 2FA authentication
+  3. Once fully logged in, export your cookies using Cookie-Editor
+  4. Save to `cookies.json`
+  5. Run the bot
+
+  The exported cookies contain your authenticated session, including the 2FA verification, so the bot doesn't need to authenticate again.
+
+  <Info>
+    Keep your browser session active (stay logged in) while the bot runs to prevent cookie expiration.
+  </Info>
+</Accordion>
+
+<Accordion title="Will I get banned for using this bot?">
+  **The bot includes safety features, but use responsibly.**
+
+  Safety features built into the bot:
+  - Checks for duplicate messages before sending
+  - Automatically pauses when rate limited (15-minute pause)
+  - Uses stealth plugin to appear more like a regular browser
+  - Respects Twitter's DM permission settings
+
+  **To minimize risk:**
+  - Don't send spam or unwanted messages
+  - Use reasonable delays between messages
+  - Don't run 24/7 - space out campaigns
+  - Monitor for rate limit warnings
+  - Only message users relevant to your search query
+  - Follow Twitter's Terms of Service
+
+  <Warning>
+    Automated activity always carries some risk. Twitter's Terms of Service discourage automation. Use this tool responsibly and at your own risk.
+  </Warning>
+</Accordion>
+
+## Technical Questions
+
+<Accordion title="Is this against Twitter's Terms of Service?">
+  **Twitter's Terms of Service generally discourage automation.**
+
+  While this bot doesn't use the Twitter API (which has strict rules), it does automate browser actions, which exists in a gray area:
+
+  - Twitter's TOS discourages "automated" behavior
+  - However, the bot mimics human actions through the browser
+  - Many users have used similar automation without issues
+  - But there's always some risk of account restrictions
+
+  **Our recommendation:**
+  - Use for legitimate outreach, not spam
+  - Keep volumes reasonable
+  - Space out activity over time
+  - Monitor your account status
+  - Be prepared to stop if you receive warnings
+
+  <Warning>
+    This tool is provided for educational and legitimate outreach purposes. Users are responsible for complying with Twitter's Terms of Service and applicable laws.
+  </Warning>
+</Accordion>
+
+<Accordion title="Can I run multiple instances simultaneously?">
+  **Technically yes, but it's not recommended.**
+
+  Running multiple instances:
+  - Increases risk of rate limiting
+  - May trigger Twitter's spam detection
+  - Requires multiple browser windows (resource intensive)
+  - Could lead to account restrictions
+
+  **If you must run multiple instances:**
+  - Use different accounts (different cookies)
+  - Run on separate machines if possible
+  - Add longer delays between messages
+  - Monitor each instance carefully for errors
+
+  <Tip>
+    Instead of running multiple instances, optimize a single instance with a well-crafted search query to reach your target audience efficiently.
+  </Tip>
+</Accordion>
+
+<Accordion title="Does the bot work on mobile/headless servers?">
+  **No for mobile. Limited support for headless servers.**
+
+  **Mobile:** 
+  - This is a desktop browser automation tool
+  - Requires Node.js and Chromium
+  - Cannot run on mobile devices
+
+  **Headless servers:**
+  - Currently set to `headless: false` (see `index.ts:19`)
+  - You can change to `headless: true` in the code
+  - Requires X11/display server on Linux, or Xvfb
+  - May need additional Chromium dependencies
+
+  For headless mode:
+  1. Edit `src/index.ts` line 19
+  2. Change `headless: false` to `headless: true`
+  3. Install display dependencies if needed
+</Accordion>
+
+<Accordion title="How do I update my message or search query?">
+  **Edit the configuration file and restart the bot.**
+
+  Steps:
+  1. Open `src/config.ts` in a text editor
+  2. Update the configuration:
+     ```typescript
+     let config: Config = {
+       searchQuery: "your new search term",
+       message: "Your new message text!"
+     }
+     ```
+  3. Save the file
+  4. Stop the bot (Ctrl+C)
+  5. Restart with `npm start`
+
+  <Info>
+    Changes to TypeScript files require recompiling, which happens automatically when you run `npm start`.
+  </Info>
+</Accordion>
+
+<Accordion title="Can I send different messages to different users?">
+  **Not without code modification.**
+
+  Currently, the bot sends the same message (from `config.message`) to all users. To send personalized messages:
+
+  1. You would need to modify `src/index.ts`
+  2. Implement logic to vary the message based on user profile data
+  3. This requires TypeScript/programming knowledge
+
+  **Possible customization approaches:**
+  - Extract username and include it in message
+  - Use different messages based on profile bio keywords
+  - Rotate between multiple message templates
+
+  <Note>
+    These features would require custom development. The current version focuses on simplicity with a single message template.
+  </Note>
+</Accordion>
+
+## Troubleshooting
+
+<Accordion title="What should I do if the bot stops working after a Twitter update?">
+  **Twitter UI updates may break the bot's selectors.**
+
+  When Twitter updates their interface, the CSS selectors in the code may no longer work:
+
+  1. **Check for bot updates:**
+     - Visit the project's GitHub repository
+     - Look for new releases or commits
+     - Update your local copy
+
+  2. **Check GitHub issues:**
+     - See if others reported the same problem
+     - Solutions may already be available
+
+  3. **Temporarily wait:**
+     - Maintainers often update the bot quickly after Twitter changes
+     - Check back in a few days
+
+  4. **Advanced: Fix selectors yourself:**
+     - Use browser DevTools to find new selectors
+     - Update selectors in `src/index.ts`
+     - Lines 100, 111, 124, 132, 142 contain key selectors
+
+  <Tip>
+    Star or watch the GitHub repository to get notifications about updates and fixes.
+  </Tip>
+</Accordion>
+
+## Still Have Questions?
+
+<Info>
+  For additional help:
+  - Check the [Troubleshooting guide](/reference/troubleshooting) for common issues
+  - Review the [Limitations page](/reference/limitations) to understand constraints
+  - Visit the project's GitHub repository for community support
+</Info>

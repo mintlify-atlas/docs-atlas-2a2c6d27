@@ -1,0 +1,206 @@
+---
+title: 'Configuration Settings'
+description: 'Configure search queries and message content for the Twitter DM Bot'
+---
+
+## Overview
+
+The Twitter DM Bot's behavior is controlled through the `config.ts` file located in the `src/` directory. This file allows you to customize what users to target and what message to send them.
+
+## Configuration File Structure
+
+The configuration uses a TypeScript interface to define the available settings. Here's the actual structure from the source code:
+
+```typescript src/config.ts
+interface Config{
+    searchQuery: string,
+    message: string
+}
+
+let config: Config = {
+    searchQuery: "vancouver",
+    message: "Hi there, Hope you are doing well."
+}
+
+export default config
+```
+
+## Configuration Parameters
+
+### searchQuery
+
+<ParamField path="searchQuery" type="string" required>
+  The search query used to find users on Twitter's Explore page. This parameter determines which posts and users the bot will target for sending DMs.
+</ParamField>
+
+The `searchQuery` parameter defines what content to search for on Twitter. The bot will navigate to Twitter's search page with your query and find users from the search results.
+
+**How it works:**
+- The bot searches Twitter using your query (similar to using Twitter's search bar)
+- It analyzes the search results (Top, Latest, People tabs)
+- Extracts user profiles from posts matching the search
+- Attempts to send your message to those users
+
+#### Search Query Examples
+
+**Location-based queries:**
+```typescript
+searchQuery: "vancouver"
+searchQuery: "new york"
+searchQuery: "london"
+```
+
+**Hashtag queries:**
+```typescript
+searchQuery: "#javascript"
+searchQuery: "#webdevelopment"
+searchQuery: "#startup"
+```
+
+**Keyword queries:**
+```typescript
+searchQuery: "looking for developers"
+searchQuery: "hiring remote"
+searchQuery: "freelance opportunities"
+```
+
+**Interest-based queries:**
+```typescript
+searchQuery: "AI enthusiast"
+searchQuery: "crypto trader"
+searchQuery: "fitness coach"
+```
+
+<Tip>
+  **Choosing Effective Search Queries:**
+  
+  - Be specific to reach your target audience
+  - Use hashtags for topic-based targeting
+  - Combine keywords for more refined results
+  - Test different queries to see which yields the best engagement
+</Tip>
+
+### message
+
+<ParamField path="message" type="string" required>
+  The direct message text that will be sent to users found through the search query.
+</ParamField>
+
+The `message` parameter is the actual DM content that will be sent to each user the bot finds.
+
+**Example messages:**
+
+```typescript
+message: "Hi there, Hope you are doing well."
+```
+
+```typescript
+message: "Hey! I noticed you're interested in web development. I'd love to connect!"
+```
+
+```typescript
+message: "Hello! I'm reaching out to people in the Vancouver tech community. Would you be interested in collaborating?"
+```
+
+<Warning>
+  **Message Content Guidelines:**
+  
+  - Keep messages personal and non-spammy
+  - Avoid overly promotional content that might trigger spam filters
+  - Twitter may rate limit or suspend accounts sending repetitive or spam-like messages
+  - The bot checks if a message was already sent to a profile to prevent duplicate sends
+</Warning>
+
+<Tip>
+  **Crafting Better Messages:**
+  
+  - Personalize based on your search query context
+  - Keep it concise and friendly
+  - Include a clear reason for reaching out
+  - Avoid all caps or excessive punctuation
+  - Consider adding a soft call-to-action
+</Tip>
+
+## Complete Configuration Example
+
+Here's a complete example of a configured `config.ts` file:
+
+```typescript src/config.ts
+interface Config{
+    searchQuery: string,
+    message: string
+}
+
+let config: Config = {
+    searchQuery: "#typescript developers",
+    message: "Hi! I'm connecting with TypeScript developers in the community. Would love to share ideas and collaborate on projects. Let me know if you're interested!"
+}
+
+export default config
+```
+
+## Editing the Configuration
+
+<Steps>
+  <Step title="Locate the config file">
+    Navigate to `src/config.ts` in the root directory of the application.
+  </Step>
+
+  <Step title="Modify the parameters">
+    Update the `searchQuery` and `message` values within the `config` object:
+    
+    ```typescript
+    let config: Config = {
+        searchQuery: "your search query here",
+        message: "Your message content here!"
+    }
+    ```
+  </Step>
+
+  <Step title="Save the file">
+    Save your changes to `config.ts`.
+  </Step>
+
+  <Step title="Restart the bot">
+    If the bot is already running, stop it and run `npm start` again to apply the new configuration.
+  </Step>
+</Steps>
+
+<Info>
+  The bot must be restarted for configuration changes to take effect. Changes made while the bot is running will not be applied until the next start.
+</Info>
+
+## Important Limitations
+
+<Note>
+  **Who Can Receive Your Messages:**
+  
+  The bot can only send messages to users who have enabled DMs from unknown accounts:
+  - Users must have their DM settings set to accept messages from everyone
+  - Due to Twitter's updates, many users now require a Twitter Plus subscription to receive DMs from unknown people
+  - The bot will skip users who don't accept DMs and continue to the next profile
+</Note>
+
+<Warning>
+  **Rate Limiting:**
+  
+  Twitter has rate limits for sending DMs. The bot automatically:
+  - Tracks which profiles have already received your message
+  - Pauses when Twitter's rate limit is detected
+  - Resumes after the rate limit period expires
+  
+  Sending too many messages in a short time may trigger Twitter's spam detection.
+</Warning>
+
+## Best Practices
+
+<Tip>
+  **Configuration Tips:**
+  
+  - Start with a narrow, specific search query to test the bot
+  - Monitor the first few messages manually to ensure everything works correctly
+  - Adjust your message based on the response rate
+  - Keep track of which search queries perform best
+  - Update your message regularly to avoid appearing automated
+  - Respect Twitter's terms of service and community guidelines
+</Tip>

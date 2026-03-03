@@ -1,0 +1,148 @@
+---
+title: Running the Bot
+description: Learn how to start, monitor, and manage the Twitter DM bot
+---
+
+## Starting the Bot
+
+Once you've completed the configuration, start the bot with:
+
+```bash
+npm start
+```
+
+This command runs `tsx watch src/index.ts` (from package.json), which starts the TypeScript bot with hot-reloading capabilities.
+
+<Warning>
+Due to Twitter's recent updates, you will now need a **Twitter Plus subscription** to send messages to people who have the option to receive DMs from unknown people disabled.
+</Warning>
+
+## What Happens When the Bot Runs
+
+When you start the bot, it performs the following actions:
+
+<Steps>
+  <Step title="Browser Launch">
+    Puppeteer launches a Chromium browser window (in non-headless mode) with your Twitter session
+  </Step>
+  
+  <Step title="Search Page Navigation">
+    The bot navigates to Twitter's search page with your configured search query
+  </Step>
+  
+  <Step title="Profile Detection">
+    It continuously scrolls and detects profile links matching the search results
+  </Step>
+  
+  <Step title="Message Sending">
+    For each unique profile, the bot opens the profile page and sends your configured message
+  </Step>
+</Steps>
+
+## Console Output Examples
+
+As the bot runs, you'll see real-time console output:
+
+```bash
+# Profile links detected
+Set(3) {
+  'https://twitter.com/user1',
+  'https://twitter.com/user2',
+  'https://twitter.com/user3'
+}
+
+# Successful message send
+Message sent
+
+# When rate limit is detected
+Script paused for 15 minutes
+```
+
+## Monitoring the Bot's Progress
+
+### Visual Monitoring
+
+The bot runs with the browser window visible (`headless: false`), allowing you to:
+- Watch the browser navigate through search results
+- See profile pages being opened in new tabs
+- Observe message composition and sending in real-time
+
+### Console Monitoring
+
+The terminal displays:
+- Sets of profile links discovered on each scroll
+- "Message sent" confirmations for successful DMs
+- Error messages if profiles don't have DM buttons
+- Rate limit pause notifications
+
+## Duplicate Message Detection
+
+The bot automatically prevents sending duplicate messages to the same person:
+
+**How it works:**
+- Before sending a message, the bot checks the DM history with that user
+- If your configured message text already exists in the conversation, the bot skips that user
+- This prevents spam alerts and respects users who've already been contacted
+
+```typescript
+// The bot searches for your message in the DM history
+let elem = await msgPage.waitForSelector(
+  `div[data-testid='DmScrollerContainer'] >>> span ::-p-text(${config.message})`,
+  { timeout: 10000 }
+);
+// If found, the profile is skipped
+```
+
+<Note>
+The bot maintains a visited URLs set during the current session to avoid opening the same profile multiple times.
+</Note>
+
+## Rate Limit Handling
+
+Twitter enforces rate limits on DM sending. When the bot detects a rate limit:
+
+### Detection
+The bot looks for the "Message failed to send" text in the DM interface:
+
+```typescript
+let errMsgElem = await msgPage.waitForSelector(
+  `div[data-testid='DmScrollerContainer'] >>> span ::-p-text(Message failed to send)`,
+  { timeout: 2000 }
+);
+```
+
+### Automatic Pause
+When rate limited, the bot automatically pauses for **15 minutes**:
+
+```bash
+Script paused for 15 minutes
+```
+
+After the pause, the bot continues where it left off.
+
+<Info>
+The 15-minute pause is built into the source code and gives Twitter's rate limit window time to reset.
+</Info>
+
+## Who Can Receive Messages
+
+<Note>
+The bot can **only** send messages to people who have allowed messages from accounts outside of their followers and following list. Users with restricted DM settings will not have a message button visible on their profile.
+</Note>
+
+If a profile doesn't have the "Send DM" button:
+- The bot waits 5 seconds for the button to appear
+- If not found, it closes that profile tab and moves to the next user
+- An error is logged to the console
+
+## Stopping the Bot
+
+To stop the bot at any time:
+
+1. **Keyboard interrupt**: Press `Ctrl+C` in the terminal
+2. **Close the browser**: Manually close the Chromium browser window
+3. **Kill the process**: Use your system's task manager to terminate the Node.js process
+
+<Tip>
+The bot maintains a `visitedUrls` set in memory. If you restart the bot, it will start fresh and may contact users again. To truly track duplicates across sessions, you would need to persist this data to a file.
+</Tip>
