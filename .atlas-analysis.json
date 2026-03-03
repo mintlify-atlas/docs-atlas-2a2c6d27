@@ -1,0 +1,55 @@
+{
+  "projectType": "cli-tool",
+  "projectName": "Twitter DM Bot",
+  "projectDescription": "Automate sending direct messages to Twitter users found via search queries using TypeScript and Puppeteer.",
+  "theme": "aspen",
+  "primaryColor": "#1DA1F2",
+  "lightColor": "#1DA1F2",
+  "darkColor": "#1DA1F2",
+  "navigation": {
+    "groups": [
+      {
+        "group": "Get Started",
+        "pages": [
+          "introduction",
+          "installation",
+          "quickstart"
+        ]
+      },
+      {
+        "group": "Configuration",
+        "pages": [
+          "configuration/cookies",
+          "configuration/settings"
+        ]
+      },
+      {
+        "group": "Usage",
+        "pages": [
+          "usage/running-the-bot",
+          "usage/how-it-works"
+        ]
+      },
+      {
+        "group": "Reference",
+        "pages": [
+          "reference/limitations",
+          "reference/troubleshooting",
+          "reference/faq"
+        ]
+      }
+    ]
+  },
+  "keyFeatures": [
+    "Automated DM sending via browser automation",
+    "Cookie-based authentication (no API required)",
+    "Duplicate message prevention",
+    "Rate limit handling",
+    "Cross-platform support"
+  ],
+  "publicApiSurface": [
+    "config.searchQuery",
+    "config.message",
+    "npm start command"
+  ]
+}
